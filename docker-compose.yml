@@ -1,6 +1,9 @@
-version: "3"
+---
+version: '3.8'
+
 services:
   ws:
+    container_name: 'filedrop-ws'
     build:
       context: ./filedrop-ws
       dockerfile: Dockerfile
@@ -13,6 +16,7 @@ services:
       - TURN_SECRET=${TURN_SECRET}
 
   web:
+    container_name: 'filedrop-web'
     build:
       context: ./filedrop-web
       dockerfile: Dockerfile
@@ -22,11 +26,13 @@ services:
         - REACT_APP_USE_BROWSER_ROUTER=1
 
   coturn:
-    image: instrumentisto/coturn
+    container_name: 'filedrop-coturn'
+    image: ghcr.io/coturn/coturn:edge-alpine
     command: --use-auth-secret --static-auth-secret=${TURN_SECRET} --no-tls --no-dtls
     network_mode: host
 
   nginx:
+    container_name: 'filedrop-nginx'
     image: nginx:alpine
     ports:
       - "${PORT}:80"
