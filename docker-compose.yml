@@ -39,8 +39,6 @@ services:
     container_name: 'filedrop-coturn'
     image: ghcr.io/coturn/coturn:edge-alpine
     command: --use-auth-secret --static-auth-secret=${TURN_SECRET} --no-tls --no-dtls
-    networks:
-      - fd-net
     network_mode: host
     restart: unless-stopped
 
