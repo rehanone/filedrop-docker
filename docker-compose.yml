@@ -10,8 +10,6 @@ networks:
 services:
   ws:
     container_name: 'filedrop-ws'
-    env_file:
-      - ./secret.env
     build:
       context: ./filedrop-ws
       dockerfile: Dockerfile
@@ -27,8 +25,6 @@ services:
 
   web:
     container_name: 'filedrop-web'
-    env_file:
-      - ./secret.env
     build:
       context: ./filedrop-web
       dockerfile: Dockerfile
@@ -41,8 +37,6 @@ services:
 
   coturn:
     container_name: 'filedrop-coturn'
-    env_file:
-      - ./secret.env
     image: ghcr.io/coturn/coturn:edge-alpine
     command: --use-auth-secret --static-auth-secret=${TURN_SECRET} --no-tls --no-dtls
     network_mode: host
@@ -52,13 +46,12 @@ services:
     networks:
       - backplain
       - inner-net
-    env_file:
-      - ./secret.env
     image: nginx:alpine
     environment:
       - DOMAIN=${DOMAIN}
     ports:
-      - "${PORT}:80"
+      - "${PORT}:80/tcp"
+      - "443:443/tcp"
     volumes:
       - ./conf/nginx:/config/nginx/
       - /docker-data/certbot/letsencrypt:/etc/letsencrypt
