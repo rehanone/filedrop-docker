@@ -1,20 +1,12 @@
 ---
 version: '3.8'
 
-networks:
-  inner-net:
-    driver: bridge
-  backplain:
-    external: true
-
 services:
   ws:
     container_name: 'filedrop-ws'
     build:
       context: ./filedrop-ws
       dockerfile: Dockerfile
-    networks:
-      - inner-net
     environment:
       - WS_HOST=0.0.0.0
       - WS_BEHIND_PROXY=yes
@@ -22,6 +14,7 @@ services:
       - TURN_SERVER=turn:${HOST}
       - TURN_USERNAME=filedrop
       - TURN_SECRET=${TURN_SECRET}
+    restart: unless-stopped
 
   web:
     container_name: 'filedrop-web'
@@ -32,20 +25,17 @@ services:
         - REACT_APP_TITLE=${TITLE}
         - REACT_APP_SERVER=ws://${HOST}:${PORT}/ws/
         - REACT_APP_USE_BROWSER_ROUTER=1
-    networks:
-      - inner-net
+    restart: unless-stopped
 
   coturn:
     container_name: 'filedrop-coturn'
     image: ghcr.io/coturn/coturn:edge-alpine
     command: --use-auth-secret --static-auth-secret=${TURN_SECRET} --no-tls --no-dtls
     network_mode: host
+    restart: unless-stopped
 
   nginx:
     container_name: 'filedrop-nginx'
-    networks:
-      - backplain
-      - inner-net
     image: nginx:alpine
     environment:
       - DOMAIN=${DOMAIN}
@@ -56,16 +46,4 @@ services:
       - ./conf/nginx:/config/nginx/
       - /docker-data/certbot/letsencrypt:/etc/letsencrypt
     command: /bin/sh -c "envsubst '$${DOMAIN}' < /config/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
-    labels:
-      traefik.enable: true
-      traefik.http.routers.filedrop.entryPoints: https
-      traefik.http.routers.adminer.rule: Host(`filedrop.uk`)
-      traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto: https
-      traefik.http.services.filedrop.loadbalancer.server.port: 5000
-      traefik.http.services.filedrop.loadbalancer.sticky.cookie: true
-      traefik.http.services.filedrop.loadbalancer.sticky.cookie.name: io
-      traefik.http.services.filedrop.loadbalancer.sticky.cookie.httponly: true
-      traefik.http.services.filedrop.loadbalancer.sticky.cookie.secure: true
-      traefik.http.services.filedrop.loadbalancer.sticky.cookie.samesite: io
-      traefik.http.middlewares.socket-replaceprefix.replacepath.path: /
-      traefik.http.routers.socket-router.middlewares: socket-replaceprefix@docker
+    restart: unless-stopped
