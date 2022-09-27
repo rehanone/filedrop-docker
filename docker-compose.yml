@@ -1,9 +1,18 @@
-version: "3"
+---
+version: '3.8'
+
+networks:
+  fd-net:
+    driver: bridge
+
 services:
   ws:
+    container_name: 'filedrop-ws'
     build:
       context: ./filedrop-ws
       dockerfile: Dockerfile
+    networks:
+      - fd-net
     environment:
       - WS_HOST=0.0.0.0
       - WS_BEHIND_PROXY=yes
@@ -11,8 +20,10 @@ services:
       - TURN_SERVER=turn:${HOST}
       - TURN_USERNAME=filedrop
       - TURN_SECRET=${TURN_SECRET}
+    restart: unless-stopped
 
   web:
+    container_name: 'filedrop-web'
     build:
       context: ./filedrop-web
       dockerfile: Dockerfile
@@ -20,16 +31,27 @@ services:
         - REACT_APP_TITLE=${TITLE}
         - REACT_APP_SERVER=ws://${HOST}:${PORT}/ws/
         - REACT_APP_USE_BROWSER_ROUTER=1
+    networks:
+      - fd-net
+    restart: unless-stopped
 
   coturn:
-    image: instrumentisto/coturn
+    container_name: 'filedrop-coturn'
+    image: ghcr.io/coturn/coturn:edge-alpine
     command: --use-auth-secret --static-auth-secret=${TURN_SECRET} --no-tls --no-dtls
+    networks:
+      - fd-net
     network_mode: host
+    restart: unless-stopped
 
   nginx:
+    container_name: 'filedrop-nginx'
     image: nginx:alpine
+    networks:
+      - fd-net
     ports:
-      - "${PORT}:80"
+      - "${PORT}:80/tcp"
     volumes:
       - ./conf/nginx:/etc/nginx
     command: /bin/sh -c "nginx -g \"daemon off;\""
+    restart: unless-stopped
