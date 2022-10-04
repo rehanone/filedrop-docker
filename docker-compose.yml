@@ -46,7 +46,7 @@ services:
       dockerfile: Dockerfile
       args:
         - REACT_APP_TITLE=${TITLE}
-        - REACT_APP_SERVER=ws://${HOST}:${PORT}/ws/
+        - REACT_APP_SERVER=wss://${HOST}:${PORT}/ws/
         - REACT_APP_USE_BROWSER_ROUTER=1
     labels:
       - 'traefik.enable=true'
