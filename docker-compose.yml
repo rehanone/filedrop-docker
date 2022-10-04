@@ -58,13 +58,13 @@ services:
     image: nginx:alpine
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.filedrop-web.rule=Host(`${HOST}`)'
-      - 'traefik.http.routers.filedrop-web.entrypoints=websecure'
-      - 'traefik.http.routers.filedrop-web.tls=true'
-      - 'traefik.http.routers.filedrop-web.tls.certresolver=le-resolver'
-      - 'traefik.http.routers.filedrop-web.middlewares=security-headers@file'
-      - 'traefik.http.services.filedrop-web.loadbalancer.server.scheme=http'
-      - 'traefik.http.services.filedrop-web.loadbalancer.server.port=80'
+      - 'traefik.http.routers.filedrop-nginx.rule=Host(`${HOST}`)'
+      - 'traefik.http.routers.filedrop-nginx.entrypoints=websecure'
+      - 'traefik.http.routers.filedrop-nginx.tls=true'
+      - 'traefik.http.routers.filedrop-nginx.tls.certresolver=le-resolver'
+      - 'traefik.http.routers.filedrop-nginx.middlewares=security-headers@file'
+      - 'traefik.http.services.filedrop-nginx.loadbalancer.server.scheme=http'
+      - 'traefik.http.services.filedrop-nginx.loadbalancer.server.port=80'
     networks:
       - fd-net
       - backplain
