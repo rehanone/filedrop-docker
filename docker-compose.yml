@@ -4,6 +4,8 @@ version: '3.8'
 networks:
   fd-net:
     driver: bridge
+  backplain:
+    external: true
 
 services:
   ws:
@@ -24,6 +26,7 @@ services:
       - 'traefik.http.routers.socket-router.middlewares=socket-replaceprefix@docker'
     networks:
       - fd-net
+      - backplain
     environment:
       - WS_HOST=0.0.0.0
       - WS_BEHIND_PROXY=yes
@@ -44,6 +47,7 @@ services:
         - REACT_APP_USE_BROWSER_ROUTER=1
     networks:
       - fd-net
+      - backplain
     restart: unless-stopped
 
   coturn:
@@ -95,7 +99,7 @@ services:
       - "--accesslog.bufferingsize=1000"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=fd-net"
+      - "--providers.docker.network=backplain"
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--entrypoints.web.address=:80/tcp"
 #      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
@@ -109,6 +113,7 @@ services:
 #      - "--experimental.plugins.traefik-real-ip.version=v1.0.3"
     networks:
       - fd-net
+      - backplain
     environment:
       TZ: Etc/UTC
     volumes:
@@ -153,4 +158,5 @@ services:
       - traefik.http.services.whoami.loadbalancer.server.port=80
     networks:
       - fd-net
+      - backplain
     restart: unless-stopped
