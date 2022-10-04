@@ -16,6 +16,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.filedrop-ws.rule=Host(`${HOST}`) && PathPrefix(`/ws/`)'
+      - 'traefik.http.routers.filedrop-ws.entrypoints=web'
       - 'traefik.http.routers.filedrop-ws.loadbalancer.server.port=5000'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie=true'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie.name=io'
@@ -93,7 +94,7 @@ services:
 #      - traefik.http.middlewares.real-ip-secured.chain.middlewares=real-ip@docker,authelia@docker
     command:
       - "--api=true"
-      - "--api.insecure=true"
+      - "--api.insecure=false"
       - "--api.dashboard=true"
       - "--ping=true"
       - "--global.checkNewVersion=true"
