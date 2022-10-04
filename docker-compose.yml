@@ -45,6 +45,14 @@ services:
         - REACT_APP_TITLE=${TITLE}
         - REACT_APP_SERVER=ws://${HOST}:${PORT}/ws/
         - REACT_APP_USE_BROWSER_ROUTER=1
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.filedrop-web.rule=Host(`${HOST}`)
+      - traefik.http.routers.filedrop-web.entrypoints=web
+#      - traefik.http.routers.filedrop-web.tls=true
+#      - traefik.http.routers.filedrop-web.middlewares=real-ip-secured
+      - traefik.http.services.filedrop-web.loadbalancer.server.scheme=http
+      - traefik.http.services.filedrop-web.loadbalancer.server.port=80
     networks:
       - fd-net
       - backplain
