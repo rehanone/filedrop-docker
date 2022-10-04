@@ -15,15 +15,15 @@ services:
       dockerfile: Dockerfile
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.socket-router.rule=PathPrefix(`/ws`)'
+      - 'traefik.http.routers.filedrop-ws.rule=Host(`${HOST}`) && PathPrefix(`/ws/`)'
       - 'traefik.http.routers.filedrop-ws.loadbalancer.server.port=5000'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie=true'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie.name=io'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie.httponly=true'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie.secure=true'
-      - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie.samesite=io'
+      - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie.samesite=none'
       - 'traefik.http.middlewares.socket-replaceprefix.replacepath.path=/'
-      - 'traefik.http.routers.socket-router.middlewares=socket-replaceprefix@docker'
+      - 'traefik.http.routers.filedrop-ws.middlewares=socket-replaceprefix@docker'
     networks:
       - fd-net
       - backplain
