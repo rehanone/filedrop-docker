@@ -63,3 +63,4 @@ services:
     command: --use-auth-secret --static-auth-secret=${TURN_SECRET} --no-tls --no-dtls
     network_mode: host
     restart: unless-stopped
+
