@@ -16,7 +16,10 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.socket-router.rule=Host(`${HOST}`) && PathPrefix(`/ws/`)'
-      - 'traefik.http.routers.socket-router.entrypoints=web'
+      - 'traefik.http.routers.socket-router.entrypoints=websecure'
+      - 'traefik.http.routers.filedrop-web.tls=true'
+      - 'traefik.http.routers.filedrop-web.tls.certresolver=le-resolver'
+      - 'traefik.http.routers.filedrop-web.middlewares=security-headers@file'
       - 'traefik.http.services.filedrop-ws.loadbalancer.server.port=5000'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie=true'
       - 'traefik.http.services.filedrop-ws.loadbalancer.sticky.cookie.name=io'
@@ -47,9 +50,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.filedrop-web.rule=Host(`${HOST}`)
-      - traefik.http.routers.filedrop-web.entrypoints=web
-#      - traefik.http.routers.filedrop-web.tls=true
-#      - traefik.http.routers.filedrop-web.middlewares=real-ip-secured
+      - traefik.http.routers.filedrop-web.entrypoints=websecure
+      - traefik.http.routers.filedrop-web.tls=true
+      - traefik.http.routers.filedrop-web.tls.certresolver=le-resolver
+      - traefik.http.routers.filedrop-web.middlewares=security-headers@file
       - traefik.http.services.filedrop-web.loadbalancer.server.scheme=http
       - traefik.http.services.filedrop-web.loadbalancer.server.port=80
     networks:
