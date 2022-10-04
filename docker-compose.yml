@@ -48,6 +48,14 @@ services:
         - REACT_APP_TITLE=${TITLE}
         - REACT_APP_SERVER=wss://${HOST}:${PORT}/ws/
         - REACT_APP_USE_BROWSER_ROUTER=1
+    networks:
+      - fd-net
+      - backplain
+    restart: unless-stopped
+
+  nginx:
+    container_name: 'filedrop-nginx'
+    image: nginx:alpine
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.filedrop-web.rule=Host(`${HOST}`)'
@@ -60,7 +68,10 @@ services:
     networks:
       - fd-net
       - backplain
-    restart: unless-stopped
+    volumes:
+      - ./conf/nginx:/etc/nginx
+    command: /bin/sh -c "nginx -g \"daemon off;\""
+
 
   coturn:
     container_name: 'filedrop-coturn'
